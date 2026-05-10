@@ -24,8 +24,17 @@ export function createApp() {
 
   app.route("/api", api);
 
-  // Health check
+  // Health check (no DB)
   app.get("/health", (c) => c.json({ status: "ok", time: new Date().toISOString() }));
+  api.get("/health", async (c) => {
+    try {
+      const { sql } = await import("./db/connection");
+      const result = await sql`SELECT 1 as ok`;
+      return c.json({ status: "ok", db: "connected" });
+    } catch (e: any) {
+      return c.json({ status: "error", db: e.message }, 500);
+    }
+  });
 
   return app;
 }
