@@ -1,0 +1,38 @@
+{
+  "name": "cet6-writing-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch server/dev.ts",
+    "dev:client": "vite",
+    "build": "vite build",
+    "start": "bun run server/dev.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx server/db/migrate.ts",
+    "db:seed": "tsx server/db/seed.ts",
+    "extract-exams": "bun run scripts/extract-exams.ts",
+    "prepare-articles": "bun run scripts/prepare-articles.ts",
+    "process-ai": "bun run scripts/ai-process-articles.ts"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.18",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@tanstack/react-query": "^5.100.9",
+    "@types/node": "^25.6.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "drizzle-kit": "^0.31.10",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.11"
+  }
+}

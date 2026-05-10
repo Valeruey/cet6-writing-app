@@ -1,0 +1,14 @@
+---
+title: Beyond Pledges: The Urgent Need for Concrete Climate Action
+source: The Guardian
+url: https://www.theguardian.com/
+tags: environment, science
+difficulty: medium
+---
+The gap between climate pledges and concrete action has never been more glaring. Despite decades of international agreements and ambitious net-zero commitments, global greenhouse gas emissions continue to rise. The latest data from the Intergovernmental Panel on Climate Change paints a sobering picture: without immediate and drastic reductions, the world is on track for warming that would render large parts of the planet uninhabitable.
+
+Part of the difficulty lies in the nature of the problem itself. Climate change is a classic collective action dilemma, where the costs of mitigation are borne immediately and locally while the benefits are diffuse and long-term. This creates a powerful incentive for governments and corporations alike to postpone meaningful action in favor of short-term economic gains.
+
+Nevertheless, there are reasons for cautious optimism. The cost of renewable energy has plummeted over the past decade, with solar and wind now cheaper than fossil fuels in most markets. Technological breakthroughs in battery storage, green hydrogen, and carbon capture are opening up new possibilities for decarbonizing sectors that were once considered intractable, such as heavy industry and long-haul transport.
+
+What is needed now is not more ambitious rhetoric but a determined focus on implementation. This means putting a meaningful price on carbon, investing massively in green infrastructure, and ensuring that the transition to a low-carbon economy is just and equitable. The window of opportunity is narrowing, but it is not yet closed. The question is not whether we have the tools to address climate change, but whether we have the collective will to use them.
