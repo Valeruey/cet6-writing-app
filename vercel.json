@@ -9,7 +9,8 @@
   "functions": {
     "api/index.ts": {
       "runtime": "nodejs22.x",
-      "includeFiles": "server/**"
+      "includeFiles": "server/**",
+      "maxDuration": 30
     }
   },
   "crons": [
