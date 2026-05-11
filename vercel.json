@@ -6,6 +6,12 @@
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
+  "functions": {
+    "api/index.ts": {
+      "runtime": "nodejs22.x",
+      "includeFiles": "server/**"
+    }
+  },
   "crons": [
     {
       "path": "/api/cron/daily-article",
