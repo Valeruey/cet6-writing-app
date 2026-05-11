@@ -1,6 +1,19 @@
 import { handle } from "hono/vercel";
-import { createApp } from "../server/app";
 
-const app = createApp();
+let appHandler: ReturnType<typeof handle>;
 
-export default handle(app);
+try {
+  const { createApp } = await import("../server/app");
+  appHandler = handle(createApp());
+} catch (e: any) {
+  console.error("App init failed:", e.message, e.stack);
+  // Fallback: minimal Hono app
+  const { Hono } = await import("hono");
+  const fallback = new Hono();
+  fallback.all("*", (c) =>
+    c.json({ error: "App initialization failed", detail: e.message }, 500)
+  );
+  appHandler = handle(fallback);
+}
+
+export default appHandler;
