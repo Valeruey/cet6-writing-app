@@ -40,3 +40,4 @@ data/*.db-*
 # Data export temp files
 data/export/
 
+api/server-bundle.js
