@@ -4,6 +4,10 @@ import { articlesRouter } from "./routes/articles";
 import { expressionsRouter } from "./routes/expressions";
 import { practiceRouter } from "./routes/practice";
 import { progressRouter } from "./routes/progress";
+import { authRouter } from "./routes/auth";
+import { translationRouter } from "./routes/translation";
+import { reviewRouter } from "./routes/review";
+import { cronRouter } from "./routes/cron";
 
 export function createApp() {
   const app = new Hono();
@@ -12,10 +16,14 @@ export function createApp() {
 
   // API routes
   const api = new Hono();
+  api.route("/auth", authRouter);
   api.route("/articles", articlesRouter);
   api.route("/expressions", expressionsRouter);
   api.route("/practice", practiceRouter);
+  api.route("/translation", translationRouter);
+  api.route("/review", reviewRouter);
   api.route("/progress", progressRouter);
+  api.route("/cron", cronRouter);
 
   // Handle saved-expressions under expressions router
   api.get("/saved-expressions", (c) =>

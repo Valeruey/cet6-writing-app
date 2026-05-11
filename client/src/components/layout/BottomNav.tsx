@@ -2,9 +2,9 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const NAV_ITEMS = [
   { to: "/", label: "首页", icon: HomeIcon },
-  { to: "/articles", label: "文章", icon: ArticleIcon },
-  { to: "/history", label: "记录", icon: HistoryIcon },
-  { to: "/saved", label: "收藏", icon: SavedIcon },
+  { to: "/articles", label: "精读", icon: ArticleIcon },
+  { to: "/practice", label: "练习", icon: PracticeIcon },
+  { to: "/saved", label: "词库", icon: SavedIcon },
 ];
 
 export default function BottomNav() {
@@ -34,7 +34,6 @@ export default function BottomNav() {
   );
 }
 
-/* Simple SVG icons inline */
 function HomeIcon({ active }: { active: boolean }) {
   return (
     <svg
@@ -66,7 +65,7 @@ function ArticleIcon({ active }: { active: boolean }) {
   );
 }
 
-function HistoryIcon({ active }: { active: boolean }) {
+function PracticeIcon({ active }: { active: boolean }) {
   return (
     <svg
       width="22"
@@ -76,8 +75,8 @@ function HistoryIcon({ active }: { active: boolean }) {
       stroke="currentColor"
       strokeWidth={2}
     >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 20h9" strokeLinecap="round" />
+      <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   );
 }

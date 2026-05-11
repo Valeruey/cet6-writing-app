@@ -1,12 +1,14 @@
 import { Hono } from "hono";
 import { db } from "../db/connection";
 import { expressions, savedExpressions } from "../db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
+import { authMiddleware } from "../middleware/auth";
+import type { AppVariables } from "../lib/types";
 
-const expressionsRouter = new Hono();
+const expressionsRouter = new Hono<{ Variables: AppVariables }>();
 
-// GET /api/expressions/:id — full analysis
+// GET /api/expressions/:id — full analysis (public)
 expressionsRouter.get("/:id", async (c) => {
   const id = c.req.param("id");
   const [expr] = await db
@@ -24,8 +26,9 @@ expressionsRouter.get("/:id", async (c) => {
 });
 
 // POST /api/expressions/:id/save — bookmark an expression
-expressionsRouter.post("/:id/save", async (c) => {
+expressionsRouter.post("/:id/save", authMiddleware, async (c) => {
   const expressionId = c.req.param("id");
+  const userId = c.get("userId");
 
   const [expr] = await db
     .select()
@@ -38,7 +41,12 @@ expressionsRouter.post("/:id/save", async (c) => {
   const [existing] = await db
     .select()
     .from(savedExpressions)
-    .where(eq(savedExpressions.expression_id, expressionId))
+    .where(
+      and(
+        eq(savedExpressions.expression_id, expressionId),
+        eq(savedExpressions.user_id, userId)
+      )
+    )
     .limit(1);
 
   if (existing) {
@@ -49,6 +57,7 @@ expressionsRouter.post("/:id/save", async (c) => {
   const id = uuid();
   await db.insert(savedExpressions).values({
     id,
+    user_id: userId,
     expression_id: expressionId,
     saved_at: now,
     review_count: 0,
@@ -58,17 +67,25 @@ expressionsRouter.post("/:id/save", async (c) => {
 });
 
 // DELETE /api/expressions/:id/save — remove bookmark
-expressionsRouter.delete("/:id/save", async (c) => {
+expressionsRouter.delete("/:id/save", authMiddleware, async (c) => {
   const expressionId = c.req.param("id");
+  const userId = c.get("userId");
+
   await db
     .delete(savedExpressions)
-    .where(eq(savedExpressions.expression_id, expressionId));
+    .where(
+      and(
+        eq(savedExpressions.expression_id, expressionId),
+        eq(savedExpressions.user_id, userId)
+      )
+    );
 
   return c.json({ message: "Unsaved" });
 });
 
-// GET /api/expressions/saved/list — list saved
-expressionsRouter.get("/saved/list", async (c) => {
+// GET /api/expressions/saved/list — list saved for current user
+expressionsRouter.get("/saved/list", authMiddleware, async (c) => {
+  const userId = c.get("userId");
   const page = parseInt(c.req.query("page") || "1");
   const limit = parseInt(c.req.query("limit") || "30");
   const offset = (page - 1) * limit;
@@ -80,6 +97,9 @@ expressionsRouter.get("/saved/list", async (c) => {
       saved_at: savedExpressions.saved_at,
       review_count: savedExpressions.review_count,
       last_reviewed: savedExpressions.last_reviewed,
+      ease_factor: savedExpressions.ease_factor,
+      interval: savedExpressions.interval,
+      next_review_at: savedExpressions.next_review_at,
       text: expressions.text,
       category: expressions.category,
       sentence_context: expressions.sentence_context,
@@ -87,6 +107,7 @@ expressionsRouter.get("/saved/list", async (c) => {
     })
     .from(savedExpressions)
     .leftJoin(expressions, eq(savedExpressions.expression_id, expressions.id))
+    .where(eq(savedExpressions.user_id, userId))
     .orderBy(desc(savedExpressions.saved_at))
     .limit(limit)
     .offset(offset);

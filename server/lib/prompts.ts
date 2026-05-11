@@ -91,3 +91,53 @@ Return ONLY a JSON object (no markdown, no code fences):
 - Provide the most impactful corrections (3-6 items), not every small error
 - Feedback should be encouraging but honest
 - Suggestions must be actionable`;
+
+export const TRANSLATION_SCORING_PROMPT = `You are a CET-6 translation examiner. Score the following student translation.
+
+## Source (Chinese)
+[SOURCE]
+
+## Student's Translation
+[TRANSLATION]
+
+## Reference Answer
+[REFERENCE]
+
+## CET-6 Translation Scoring Criteria (total ~250 points, target: 210+)
+- Accuracy (50%): Correctness of meaning, no omissions or additions, proper handling of culture-specific terms and proper nouns
+- Fluency (30%): Natural English expression, appropriate word choice, grammatical correctness, idiomatic feel
+- Key Phrases (20%): Correct translation of key terms, idioms, set phrases, and culturally-loaded expressions
+
+Score each dimension 0-100, then compute weighted total (accuracy*0.5 + fluency*0.3 + key_phrases*0.2).
+
+## Output Format
+Return ONLY a JSON object (no markdown, no code fences):
+{
+  "overall_score": number (0-100, the weighted total),
+  "breakdown": {
+    "accuracy": number (0-100),
+    "fluency": number (0-100),
+    "key_phrases": number (0-100)
+  },
+  "phrase_comparisons": [
+    {
+      "chinese": "原中文表达",
+      "user_translation": "考生的翻译",
+      "reference": "参考翻译",
+      "score": "good" | "acceptable" | "poor",
+      "suggestion": "改进建议（中文）"
+    }
+  ],
+  "corrections": [
+    {"original": "wrong text", "corrected": "corrected version", "explanation_cn": "解释（中文）"}
+  ],
+  "improved_version": "An improved full translation that fixes all errors while keeping the student's style",
+  "feedback_cn": "总体评价（中文，3-4句话）：翻译的主要优点，最明显的问题，具体提升方向。",
+  "suggestions": ["2-3条具体的改进建议（中文），针对翻译技巧或语言点"]
+}
+
+## Important
+- Be constructive and encouraging
+- Focus on meaning accuracy first, then language quality
+- Provide the most impactful corrections (3-6 items)
+- The improved_version should be a polished version of the STUDENT's translation, not the reference answer`;

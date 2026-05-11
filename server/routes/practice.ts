@@ -1,13 +1,15 @@
 import { Hono } from "hono";
 import { db } from "../db/connection";
 import { practiceSessions } from "../db/schema";
-import { eq, desc, count } from "drizzle-orm";
+import { eq, and, desc, count } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
 import { generatePracticePrompt, scoreEssay } from "../services/ai-client";
+import { authMiddleware } from "../middleware/auth";
+import type { AppVariables } from "../lib/types";
 
-const practiceRouter = new Hono();
+const practiceRouter = new Hono<{ Variables: AppVariables }>();
 
-// POST /api/practice/generate — generate AI practice prompt
+// POST /api/practice/generate — generate AI practice prompt (public for now)
 practiceRouter.post("/generate", async (c) => {
   let body: { type?: string; article_id?: string; topic_keyword?: string };
   try {
@@ -29,7 +31,9 @@ practiceRouter.post("/generate", async (c) => {
 });
 
 // POST /api/practice/score — score user writing
-practiceRouter.post("/score", async (c) => {
+practiceRouter.post("/score", authMiddleware, async (c) => {
+  const userId = c.get("userId");
+
   let body: { type?: string; prompt_text?: string; user_writing?: string };
   try {
     body = await c.req.json();
@@ -57,6 +61,7 @@ practiceRouter.post("/score", async (c) => {
   const sessionId = uuid();
   await db.insert(practiceSessions).values({
     id: sessionId,
+    user_id: userId,
     type: body.type || "writing",
     prompt_text: body.prompt_text,
     source: "ai_generated",
@@ -72,19 +77,22 @@ practiceRouter.post("/score", async (c) => {
   return c.json({ ...result, session_id: sessionId });
 });
 
-// GET /api/practice/history — list past practice sessions
-practiceRouter.get("/history", async (c) => {
+// GET /api/practice/history — list past practice sessions for current user
+practiceRouter.get("/history", authMiddleware, async (c) => {
+  const userId = c.get("userId");
   const page = parseInt(c.req.query("page") || "1");
   const limit = parseInt(c.req.query("limit") || "20");
   const offset = (page - 1) * limit;
 
   const totalResult = await db
     .select({ count: count() })
-    .from(practiceSessions);
+    .from(practiceSessions)
+    .where(eq(practiceSessions.user_id, userId));
 
   const list = await db
     .select()
     .from(practiceSessions)
+    .where(eq(practiceSessions.user_id, userId))
     .orderBy(desc(practiceSessions.created_at))
     .limit(limit)
     .offset(offset);
@@ -103,12 +111,19 @@ practiceRouter.get("/history", async (c) => {
 });
 
 // GET /api/practice/sessions/:id — get one session detail
-practiceRouter.get("/sessions/:id", async (c) => {
+practiceRouter.get("/sessions/:id", authMiddleware, async (c) => {
+  const userId = c.get("userId");
   const id = c.req.param("id");
+
   const [session] = await db
     .select()
     .from(practiceSessions)
-    .where(eq(practiceSessions.id, id))
+    .where(
+      and(
+        eq(practiceSessions.id, id),
+        eq(practiceSessions.user_id, userId)
+      )
+    )
     .limit(1);
 
   if (!session) return c.json({ error: "Session not found" }, 404);

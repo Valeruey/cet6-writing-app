@@ -160,3 +160,35 @@ export interface ScorePracticeResponse {
   feedback_cn: string;
   suggestions: string[];
 }
+
+// ====== Translation ======
+export interface TranslationScoreBreakdown {
+  accuracy: number;
+  fluency: number;
+  key_phrases: number;
+}
+
+export interface PhraseComparison {
+  chinese: string;
+  user_translation: string;
+  reference: string;
+  score: "good" | "acceptable" | "poor";
+  suggestion: string;
+}
+
+export interface ScoreTranslationRequest {
+  source_text: string;
+  user_translation: string;
+  reference_answer?: string;
+  topic_id?: string;
+}
+
+export interface ScoreTranslationResponse {
+  overall_score: number;
+  breakdown: TranslationScoreBreakdown;
+  phrase_comparisons: PhraseComparison[];
+  corrections: Correction[];
+  improved_version: string;
+  feedback_cn: string;
+  suggestions: string[];
+}

@@ -44,6 +44,7 @@ export const examTopics = pgTable("exam_topics", {
 
 export const practiceSessions = pgTable("practice_sessions", {
   id: text("id").primaryKey(),
+  user_id: text("user_id"),
   type: text("type").notNull(),
   prompt_text: text("prompt_text").notNull(),
   source: text("source"),
@@ -59,6 +60,7 @@ export const practiceSessions = pgTable("practice_sessions", {
 
 export const userProgress = pgTable("user_progress", {
   id: text("id").primaryKey(),
+  user_id: text("user_id"),
   article_id: text("article_id").references(() => articles.id),
   completed: integer("completed").notNull().default(0),
   expressions_saved: integer("expressions_saved").notNull().default(0),
@@ -68,10 +70,14 @@ export const userProgress = pgTable("user_progress", {
 
 export const savedExpressions = pgTable("saved_expressions", {
   id: text("id").primaryKey(),
+  user_id: text("user_id"),
   expression_id: text("expression_id")
     .notNull()
     .references(() => expressions.id),
   saved_at: text("saved_at").notNull().default(""),
   review_count: integer("review_count").default(0),
   last_reviewed: text("last_reviewed"),
+  ease_factor: real("ease_factor").default(2.5),
+  interval: integer("interval").default(0),
+  next_review_at: text("next_review_at"),
 });

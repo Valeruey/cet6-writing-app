@@ -3,6 +3,7 @@ import {
   ANALYSIS_PROMPT,
   PRACTICE_GENERATION_PROMPT,
   ESSAY_SCORING_PROMPT,
+  TRANSLATION_SCORING_PROMPT,
 } from "../lib/prompts";
 
 const API_KEY = process.env.DEEPSEEK_API_KEY || "";
@@ -167,6 +168,43 @@ export async function scoreEssay(
     return JSON.parse(extractJson(result));
   } catch (e) {
     console.error("Failed to parse scoring result:", result.slice(0, 500));
+    return null;
+  }
+}
+
+export async function scoreTranslation(
+  sourceText: string,
+  userTranslation: string,
+  referenceAnswer: string
+): Promise<{
+  overall_score: number;
+  breakdown: { accuracy: number; fluency: number; key_phrases: number };
+  phrase_comparisons: Array<{
+    chinese: string;
+    user_translation: string;
+    reference: string;
+    score: string;
+    suggestion: string;
+  }>;
+  corrections: Array<{ original: string; corrected: string; explanation_cn: string }>;
+  improved_version: string;
+  feedback_cn: string;
+  suggestions: string[];
+} | null> {
+  const fullPrompt = TRANSLATION_SCORING_PROMPT
+    .replace("[SOURCE]", sourceText)
+    .replace("[TRANSLATION]", userTranslation)
+    .replace("[REFERENCE]", referenceAnswer);
+
+  const result = await chat("You are a CET-6 translation examiner. Return only JSON.", fullPrompt, {
+    temperature: 0.3,
+    maxTokens: 4096,
+  });
+
+  try {
+    return JSON.parse(extractJson(result));
+  } catch (e) {
+    console.error("Failed to parse translation scoring result:", result.slice(0, 500));
     return null;
   }
 }
