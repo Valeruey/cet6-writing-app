@@ -6,7 +6,7 @@
     "dev": "bun run --watch server/dev.ts",
     "dev:client": "vite",
     "build": "vite build && bun run build:server",
-    "build:server": "node ./node_modules/esbuild/bin/esbuild server/index.ts --bundle --outfile=api/server-bundle.js --platform=node --format=esm --target=node22 --external:@neondatabase/serverless --external:bun:sqlite",
+    "build:server": "node ./node_modules/esbuild/bin/esbuild server/index.ts --bundle --packages=external --outfile=api/server-bundle.js --platform=node --format=esm --target=node22",
     "start": "bun run server/dev.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "NODE_TLS_REJECT_UNAUTHORIZED=0 bun run server/db/migrate.ts",
